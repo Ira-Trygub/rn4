@@ -1,0 +1,61 @@
+===========================================================================
+Interface List
+  6...00 ff 18 85 bc a2 ......TAP-Windows Adapter V9 for OpenVPN Connect
+ 17...80 ce 62 50 09 16 ......Realtek PCIe GBE Family Controller
+ 50...00 15 5d 4e 9f 26 ......Hyper-V Virtual Ethernet Adapter
+ 19...00 ff d3 36 a0 da ......TAP-ProtonVPN Windows Adapter V9
+ 20...60 f6 77 83 bb e4 ......Microsoft Wi-Fi Direct Virtual Adapter
+ 14...62 f6 77 83 bb e3 ......Microsoft Wi-Fi Direct Virtual Adapter #2
+ 16...60 f6 77 83 bb e3 ......Intel(R) Dual Band Wireless-AC 7265
+ 11...60 f6 77 83 bb e7 ......Bluetooth Device (Personal Area Network) #3
+  1...........................Software Loopback Interface 1
+===========================================================================
+
+IPv4 Route Table
+===========================================================================
+Active Routes:
+Network Destination        Netmask          Gateway       Interface  Metric
+          0.0.0.0          0.0.0.0     192.168.10.1   192.168.10.139     50
+        127.0.0.0        255.0.0.0         On-link         127.0.0.1    331
+        127.0.0.1  255.255.255.255         On-link         127.0.0.1    331
+  127.255.255.255  255.255.255.255         On-link         127.0.0.1    331
+     172.18.224.0    255.255.240.0         On-link      172.18.224.1    271
+     172.18.224.1  255.255.255.255         On-link      172.18.224.1    271
+   172.18.239.255  255.255.255.255         On-link      172.18.224.1    271
+     192.168.10.0    255.255.255.0         On-link    192.168.10.139    306
+   192.168.10.139  255.255.255.255         On-link    192.168.10.139    306
+   192.168.10.255  255.255.255.255         On-link    192.168.10.139    306
+        224.0.0.0        240.0.0.0         On-link         127.0.0.1    331
+        224.0.0.0        240.0.0.0         On-link    192.168.10.139    306
+        224.0.0.0        240.0.0.0         On-link      172.18.224.1    271
+  255.255.255.255  255.255.255.255         On-link         127.0.0.1    331
+  255.255.255.255  255.255.255.255         On-link    192.168.10.139    306
+  255.255.255.255  255.255.255.255         On-link      172.18.224.1    271
+===========================================================================
+Persistent Routes:
+  None
+
+IPv6 Route Table
+===========================================================================
+Active Routes:
+ If Metric Network Destination      Gateway
+ 16    306 ::/0                     fe80::f669:42ff:fe58:57b9
+  1    331 ::1/128                  On-link
+ 16    306 2a01:c23:88ed:4100::/56  fe80::f669:42ff:fe58:57b9
+ 16    306 2a01:c23:88ed:4100::/64  On-link
+ 16    306 2a01:c23:88ed:4100:913c:967a:38bd:f3a3/128
+                                    On-link
+ 16    306 2a01:c23:88ed:4100:ecdb:ba63:f3eb:b35b/128
+                                    On-link
+ 50    271 fe80::/64                On-link
+ 16    306 fe80::/64                On-link
+ 50    271 fe80::ccd5:4b04:ccd8:a70f/128
+                                    On-link
+ 16    306 fe80::ecdb:ba63:f3eb:b35b/128
+                                    On-link
+  1    331 ff00::/8                 On-link
+ 50    271 ff00::/8                 On-link
+ 16    306 ff00::/8                 On-link
+===========================================================================
+Persistent Routes:
+  None
