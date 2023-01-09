@@ -1,8 +1,8 @@
 import java.io.IOException;
 import java.net.*;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class DHCPv6Explorer {
     private DatagramSocket socket;
@@ -18,7 +18,7 @@ public class DHCPv6Explorer {
 
     public static void main(String[] args) {
         try {
-            // showNetwork();
+            showNetwork();
             // fe80:0:0:0:1c8e:5929:a87b:9111%en0 with Prefix-Length 64
             var socket = new DatagramSocket();
             var buf = hexStringtoByteArray(
@@ -26,11 +26,12 @@ public class DHCPv6Explorer {
                             "1c8e5929a87b9111ff02000000000000" +
                             "00000000000000028500cdf200000000"
             );
-            InetAddress address = Inet6Address.getByName("ff02::2");
-            var packet = new DatagramPacket(buf, buf.length, address, 0);
+            var address = Inet6Address.getByName("ff02::2%en0");
+            var packet = new DatagramPacket(buf, buf.length, address, 547);
             socket.send(packet);
+            Thread.sleep(1000);
             socket.close();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -92,13 +93,19 @@ public class DHCPv6Explorer {
     private static void showNetwork() throws SocketException {
         /* Netzwerk-Infos fuer alle Interfaces ausgeben */
         Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
-        while (en.hasMoreElements()) {
-            NetworkInterface ni = en.nextElement();
+        var s = StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(en.asIterator(), Spliterator.ORDERED),
+                false
+        ).collect(Collectors.toList());
+        s.forEach(ni -> {
             System.out.println("\nDisplay Name = " + ni.getDisplayName());
             System.out.println(" Name = " + ni.getName());
             System.out.println(" Scope ID (Interface ID) = " + ni.getIndex());
-            System.out.println(" Hardware (LAN) Address = " + byteArraytoHexString(ni.getHardwareAddress()));
-
+            try {
+                System.out.println(" Hardware (LAN) Address = " + byteArraytoHexString(ni.getHardwareAddress()));
+            } catch (SocketException e) {
+                throw new RuntimeException(e);
+            }
             List<InterfaceAddress> list = ni.getInterfaceAddresses();
             Iterator<InterfaceAddress> it = list.iterator();
 
@@ -107,7 +114,7 @@ public class DHCPv6Explorer {
                 System.out
                         .println(" Adress = " + ia.getAddress() + " with Prefix-Length " + ia.getNetworkPrefixLength());
             }
-        }
+        });
     }
 
     private Inet6Address getAdress(String host, byte[] addr, int scopeId) throws UnknownHostException {
