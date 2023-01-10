@@ -1,60 +1,35 @@
-import java.io.IOException;
 import java.net.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class B {
-    private DatagramSocket socket;
-    private boolean running;
-    private byte[] buf = new byte[256];
-    private String multicastAdressPrefix = "FF32:00FF:";
-
-    /*
-    public DHCPv6Explorer() throws SocketException {
-        socket = new DatagramSocket(4445);
-    }
-    */
-
     public static void main(String[] args) {
         try {
+            showNetwork();
             String msgId = "01";
             String transactionId = "123456";
             String clientIdOption = "0001";
             String optionLen = "000A";
-            String duidType = "0003"; // 2 Bytes
-            String hardwareType = "0001"; // 2 Bytes
-            String linkLayerAddress = "60F67783BBE3"; //fe80000000000000ecdbba63f3ebb35b%16";
-            String scopeId = "16";
-            String buf = msgId + transactionId + clientIdOption + optionLen + duidType + hardwareType + linkLayerAddress;
-
-
-
-
-            //showNetwork();
-            // fe80:0:0:0:1c8e:5929:a87b:9111%en0 with Prefix-Length 64
+            String duidType = "0003";
+            String hardwareType = "0001";
+            String linkLayerAddress = "88665a0f1fe8";
+            String scopeId = "en0";
+            String send = msgId + transactionId + clientIdOption + optionLen + duidType + hardwareType + linkLayerAddress;
             var socket = new DatagramSocket();
-            // var buf = hexStringtoByteArray("6000000000083afffe80000000000000ecdbba63f3ebb35bff02000000000000000000000000000285002eb000000000");
-            // "600f07f300083afffe80000000000000" +
-            //        "1c8e5929a87b9111ff02000000000000" +
-            //       "00000000000000028500cdf200000000"
-            // );
-            var address = Inet6Address.getByName("ff02::1:2%" + scopeId);
-            byte[] bufArray = hexStringtoByteArray(buf);
-            var packet = new DatagramPacket(bufArray, bufArray.length, address, 547);
+            var addr = Inet6Address.getByName("ff02::1:2%" + scopeId);
+            byte[] sendBuf = hexStringtoByteArray(send);
+            var packet = new DatagramPacket(sendBuf, sendBuf.length, addr, 547);
             socket.send(packet);
-            //Thread.sleep(1000);
-            byte[] receiveByte = new byte[1024];
-            DatagramPacket receivePaket = new DatagramPacket(receiveByte, 1024);
-            socket.receive(receivePaket);
-            String receiveString = byteArraytoHexString(receiveByte);
+            byte[] receiveBuf = new byte[1024];
+            DatagramPacket resp = new DatagramPacket(receiveBuf, 1024);
+            socket.receive(resp);
+            System.out.println("GOT" + resp.getLength() + ":" + byteArraytoHexString(resp.getData()));
             socket.close();
-        } catch (IOException e ) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
-
 
 
     private static byte[] hexStringtoByteArray(String hex) {
@@ -82,10 +57,7 @@ public class B {
     private static void showNetwork() throws SocketException {
         /* Netzwerk-Infos fuer alle Interfaces ausgeben */
         Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
-        var s = StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(en.asIterator(), Spliterator.ORDERED),
-                false
-        ).collect(Collectors.toList());
+        var s = StreamSupport.stream(Spliterators.spliteratorUnknownSize(en.asIterator(), Spliterator.ORDERED), false).collect(Collectors.toList());
         s.forEach(ni -> {
             System.out.println("\nDisplay Name = " + ni.getDisplayName());
             System.out.println(" Name = " + ni.getName());
@@ -100,8 +72,7 @@ public class B {
 
             while (it.hasNext()) {
                 InterfaceAddress ia = it.next();
-                System.out
-                        .println(" Adress = " + ia.getAddress() + " with Prefix-Length " + ia.getNetworkPrefixLength());
+                System.out.println(" Adress = " + ia.getAddress() + " with Prefix-Length " + ia.getNetworkPrefixLength());
             }
         });
     }
