@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class DHCPv6Explorer {
+public class B {
     private DatagramSocket socket;
     private boolean running;
     private byte[] buf = new byte[256];
@@ -18,68 +18,43 @@ public class DHCPv6Explorer {
 
     public static void main(String[] args) {
         try {
-            showNetwork();
-            // fe80:0:0:0:1c8e:5929:a87b:9111%en0 with Prefix-Length 64
-            var socket = new DatagramSocket();
             String msgId = "01";
             String transactionId = "123456";
             String clientIdOption = "0001";
             String optionLen = "000A";
             String duidType = "0003"; // 2 Bytes
             String hardwareType = "0001"; // 2 Bytes
-            String linkLayerAddress = "88665a0f1fe8"; // 6 Bytes Mac-Addr
+            String linkLayerAddress = "60F67783BBE3"; //fe80000000000000ecdbba63f3ebb35b%16";
+            String scopeId = "16";
+            String buf = msgId + transactionId + clientIdOption + optionLen + duidType + hardwareType + linkLayerAddress;
 
-            String datagram = msgId + transactionId + clientIdOption + optionLen + duidType + hardwareType + linkLayerAddress;
-            var buf = hexStringtoByteArray(
-                    datagram
-//                    "600f07f300083afffe80000000000000" +
-//                            "1c8e5929a87b9111ff02000000000000" +
-//                            "00000000000000028500cdf200000000"
-            );
 
-            var address = Inet6Address.getByName("ff02::1:2%en0");
-            var packet = new DatagramPacket(buf, buf.length, address, 547);
+
+
+            //showNetwork();
+            // fe80:0:0:0:1c8e:5929:a87b:9111%en0 with Prefix-Length 64
+            var socket = new DatagramSocket();
+            // var buf = hexStringtoByteArray("6000000000083afffe80000000000000ecdbba63f3ebb35bff02000000000000000000000000000285002eb000000000");
+            // "600f07f300083afffe80000000000000" +
+            //        "1c8e5929a87b9111ff02000000000000" +
+            //       "00000000000000028500cdf200000000"
+            // );
+            var address = Inet6Address.getByName("ff02::1:2%" + scopeId);
+            byte[] bufArray = hexStringtoByteArray(buf);
+            var packet = new DatagramPacket(bufArray, bufArray.length, address, 547);
             socket.send(packet);
-            var respData = new byte[1024];
-            DatagramPacket resp = new DatagramPacket(respData, respData.length);
-            socket.receive(resp);
-            System.out.println("Received: " + byteArraytoHexString(resp.getData()));
+            //Thread.sleep(1000);
+            byte[] receiveByte = new byte[1024];
+            DatagramPacket receivePaket = new DatagramPacket(receiveByte, 1024);
+            socket.receive(receivePaket);
+            String receiveString = byteArraytoHexString(receiveByte);
             socket.close();
-        } catch (Exception e) {
+        } catch (IOException e ) {
             throw new RuntimeException(e);
         }
     }
 
-    public void run() {
-        running = true;
 
-        while (running) {
-            DatagramPacket packet
-                    = new DatagramPacket(buf, buf.length);
-            try {
-                socket.receive(packet);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            InetAddress address = packet.getAddress();
-            int port = packet.getPort();
-            packet = new DatagramPacket(buf, buf.length, address, port);
-            String received
-                    = new String(packet.getData(), 0, packet.getLength());
-
-            if (received.equals("end")) {
-                running = false;
-                continue;
-            }
-            try {
-                socket.send(packet);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        socket.close();
-    }
 
 
     private static byte[] hexStringtoByteArray(String hex) {
