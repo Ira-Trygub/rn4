@@ -31,7 +31,6 @@ public class B {
         }
     }
 
-
     private static byte[] hexStringtoByteArray(String hex) {
         /* Konvertiere den String mit Hex-Ziffern in ein Byte-Array */
         byte[] val = new byte[hex.length() / 2];
@@ -75,9 +74,5 @@ public class B {
                 System.out.println(" Adress = " + ia.getAddress() + " with Prefix-Length " + ia.getNetworkPrefixLength());
             }
         });
-    }
-
-    private Inet6Address getAdress(String host, byte[] addr, int scopeId) throws UnknownHostException {
-        return Inet6Address.getByAddress(host, addr, scopeId);
     }
 }
